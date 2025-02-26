@@ -1,11 +1,13 @@
 package com.example.backend.service;
 
+import com.example.backend.model.ModuleModel;
+import com.example.backend.model.UserModel;
+import com.example.backend.repository.ModuleRepository;
+import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.backend.repository.ModuleRepository;
-import com.example.backend.model.ModuleModel;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ModuleService {
@@ -13,28 +15,26 @@ public class ModuleService {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    // Get all modules with user details
     public List<ModuleModel> getAllModules() {
         return moduleRepository.findAll();
     }
 
-    public Optional<ModuleModel> getModuleById(String id) {
-        return moduleRepository.findById(id);
-    }
+    // Create a module and assign a user
+    public ModuleModel createModule(String moduleName, String description, String userId) {
+        UserModel user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return null;
+        }
 
-    public ModuleModel createModule(ModuleModel module) {
+        ModuleModel module = new ModuleModel();
+        module.setModuleName(moduleName);
+        module.setDescription(description);
+        module.setUser(user);
+
         return moduleRepository.save(module);
-    }
-
-    public ModuleModel updateModule(String id, ModuleModel updatedModule) {
-        return moduleRepository.findById(id).map(module -> {
-            module.setModuleName(updatedModule.getModuleName());
-            module.setDescription(updatedModule.getDescription());
-            module.setAdmin(updatedModule.getAdmin());
-            return moduleRepository.save(module);
-        }).orElse(null);
-    }
-
-    public void deleteModule(String id) {
-        moduleRepository.deleteById(id);
     }
 }
