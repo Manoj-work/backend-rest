@@ -1,9 +1,7 @@
 package com.example.backend.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -23,12 +21,13 @@ public class EmployeeModel {
 
     private String title; // Job Title
 
-    @Email(message = "Invalid email format")
+    @Email(message = "Invalid email format!")
     @Indexed(unique = true)  // Ensure unique email in MongoDB
     private String email;
 
     @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     @Indexed(unique = true)  // Ensure unique phone in MongoDB
+    @NotBlank(message = "Phone number cannot be empty")
     private String phone;
 
     private String department;
@@ -40,23 +39,35 @@ public class EmployeeModel {
     private String permanentAddress;
     private String currentAddress;
 
-    // ✅ ID Proofs Section
+    //ID Proofs Section
+    @Valid
     private IdProofs idProofs = new IdProofs();
 
-    // ✅ Bank Details Section
+    //Bank Details Section
+    @Valid
     private BankDetails bankDetails = new BankDetails();
 
-    // ✅ Salary Details Section
+    //Salary Details Section
+    @Valid
     private SalaryDetails salaryDetails = new SalaryDetails();
 
     // Nested class for ID Proofs
     @Getter
     @Setter
     public static class IdProofs {
+        @Pattern(regexp = "\\d{12}", message = "Aadhar number must be exactly 12 digits")
         private String aadharNo = "";
+
+        @Pattern(regexp = "[A-Z]{5}[0-9]{4}[A-Z]{1}", message = "Invalid PAN number format")
         private String panNo = "";
+
+        @Pattern(regexp = "^[A-Z]{1}[0-9]{7}$", message = "Invalid Passport number format")
         private String passport = "";
+
+        @Pattern(regexp = "^[A-Za-z0-9]{8,16}$", message = "Invalid Driving License format")
         private String drivingLicense = "";
+
+        @Pattern(regexp = "^[A-Z]{3}[0-9]{7}$", message = "Invalid Voter ID format")
         private String voterId = "";
     }
 
@@ -64,10 +75,19 @@ public class EmployeeModel {
     @Getter
     @Setter
     public static class BankDetails {
+        @Pattern(regexp = "\\d{9,18}", message = "Account number must be between 9 to 18 digits")
         private String accountNumber = "";
+
+//        @NotBlank(message = "Account holder name cannot be empty")
         private String accountHolderName = "";
+
+        @Pattern(regexp = "^[A-Z]{4}0[A-Z0-9]{6}$", message = "Invalid IFSC Code format")
         private String ifscCode = "";
+
+//        @NotBlank(message = "Bank name cannot be empty")
         private String bankName = "";
+
+//        @NotBlank(message = "Branch name cannot be empty")
         private String branchName = "";
     }
 

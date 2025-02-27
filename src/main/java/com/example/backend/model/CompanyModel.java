@@ -19,7 +19,9 @@ public class CompanyModel {
     private String id;  //  MongoDB uses String IDs by default
 
     @NotBlank(message = "Company name cannot be empty")
+    @Size(min = 2, message = "Company name must have at least 2 characters")
     private String name;
+
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Invalid email format")
@@ -31,8 +33,12 @@ public class CompanyModel {
     @Indexed(unique = true)  //  Ensure unique phone in MongoDB
     private String phone;
 
-    @NotBlank(message = "GST number cannot be empty")
-    @Size(min = 15, max = 15, message = "GST number must be exactly 15 characters")
+
+    @NotBlank(message = "GST number is required")
+    @Pattern(
+            regexp = "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$",
+            message = "Invalid GST format. Must be a 15-character alphanumeric GSTIN."
+    )
     private String gst;
 
     @NotBlank(message = "Registration address cannot be empty")

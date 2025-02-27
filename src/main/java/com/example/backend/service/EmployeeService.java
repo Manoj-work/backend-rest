@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.exception.DuplicateResourceException;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.model.EmployeeModel;
 import com.example.backend.repository.EmployeeRepository;
@@ -16,6 +17,12 @@ public class EmployeeService {
 
     //Create Employee
     public EmployeeModel createEmployee(EmployeeModel employee) {
+        if(employeeRepository.findByEmail(employee.getEmail()).isPresent()){
+            throw new DuplicateResourceException("Email already exists: " + employee.getEmail());
+        }
+        if(employeeRepository.findByPhone(employee.getPhone()).isPresent()){
+            throw new DuplicateResourceException("Phone number already exists : " + employee.getPhone());
+        }
         return employeeRepository.save(employee);
     }
 
