@@ -2,10 +2,13 @@ package com.example.backend.controller;
 
 import com.example.backend.model.UserModel;
 import com.example.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/superadmin/modules/users")
@@ -16,13 +19,18 @@ public class UserController {
 
     // Get all users for dropdown
     @GetMapping
-    public List<UserModel> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserModel>> getAllUsers() {
+        List<UserModel> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     // Create a new user
     @PostMapping
-    public UserModel createUser(@RequestBody UserModel user) {
-        return userService.createUser(user);
+    public ResponseEntity<Map<String, Object>> createUser(@Valid @RequestBody UserModel user) {
+        UserModel savedUser = userService.createUser(user);
+        return ResponseEntity.ok(Map.of(
+                "message", "User created successfully!",
+                "user", savedUser
+        ));
     }
 }

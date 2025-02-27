@@ -17,12 +17,17 @@ public class EmployeeService {
 
     //Create Employee
     public EmployeeModel createEmployee(EmployeeModel employee) {
-        if(employeeRepository.findByEmail(employee.getEmail()).isPresent()){
-            throw new DuplicateResourceException("Email already exists: " + employee.getEmail());
+
+        if(employee.getEmail() != null){
+            if(employeeRepository.findByEmail(employee.getEmail()).isPresent()){
+                throw new DuplicateResourceException("Email already exists: " + employee.getEmail());
+            }
         }
+
         if(employeeRepository.findByPhone(employee.getPhone()).isPresent()){
             throw new DuplicateResourceException("Phone number already exists : " + employee.getPhone());
         }
+        employee = setDefaultValues(employee);
         return employeeRepository.save(employee);
     }
 
@@ -49,4 +54,54 @@ public class EmployeeService {
             return employeeRepository.save(existingEmployee);
         }).orElseThrow(() -> new ResourceNotFoundException("Employee with ID " + id + " not found"));
     }
+
+
+    // Set default values for missing fields
+    private EmployeeModel setDefaultValues(EmployeeModel employee) {
+        if (employee.getName() == null) employee.setName("");
+        if (employee.getTitle() == null) employee.setTitle("");
+        if (employee.getEmail() == null) employee.setEmail("");
+        if (employee.getPhone() == null) employee.setPhone("");
+        if (employee.getDepartment() == null) employee.setDepartment("");
+        if (employee.getGender() == null) employee.setGender("");
+        if (employee.getReportingManager() == null) employee.setReportingManager("");
+        if (employee.getPermanentAddress() == null) employee.setPermanentAddress("");
+        if (employee.getCurrentAddress() == null) employee.setCurrentAddress("");
+
+        // ID Proofs
+        if (employee.getIdProofs() == null) {
+            employee.setIdProofs(new EmployeeModel.IdProofs());
+        } else {
+            if (employee.getIdProofs().getAadharNo() == null) employee.getIdProofs().setAadharNo("");
+            if (employee.getIdProofs().getPanNo() == null) employee.getIdProofs().setPanNo("");
+            if (employee.getIdProofs().getPassport() == null) employee.getIdProofs().setPassport("");
+            if (employee.getIdProofs().getDrivingLicense() == null) employee.getIdProofs().setDrivingLicense("");
+            if (employee.getIdProofs().getVoterId() == null) employee.getIdProofs().setVoterId("");
+        }
+
+        // Bank Details
+        if (employee.getBankDetails() == null) {
+            employee.setBankDetails(new EmployeeModel.BankDetails());
+        } else {
+            if (employee.getBankDetails().getAccountNumber() == null) employee.getBankDetails().setAccountNumber("");
+            if (employee.getBankDetails().getAccountHolderName() == null) employee.getBankDetails().setAccountHolderName("");
+            if (employee.getBankDetails().getIfscCode() == null) employee.getBankDetails().setIfscCode("");
+            if (employee.getBankDetails().getBankName() == null) employee.getBankDetails().setBankName("");
+            if (employee.getBankDetails().getBranchName() == null) employee.getBankDetails().setBranchName("");
+        }
+
+        // Salary Details
+        if (employee.getSalaryDetails() == null) {
+            employee.setSalaryDetails(new EmployeeModel.SalaryDetails());
+        } else {
+            if (employee.getSalaryDetails().getTotalCtc() == null) employee.getSalaryDetails().setTotalCtc(0.0);
+            if (employee.getSalaryDetails().getBasic() == null) employee.getSalaryDetails().setBasic(0.0);
+            if (employee.getSalaryDetails().getAllowances() == null) employee.getSalaryDetails().setAllowances(0.0);
+            if (employee.getSalaryDetails().getHra() == null) employee.getSalaryDetails().setHra(0.0);
+            if (employee.getSalaryDetails().getPf() == null) employee.getSalaryDetails().setPf(0.0);
+        }
+
+        return employee;
+    }
+
 }

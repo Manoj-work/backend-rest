@@ -1,9 +1,10 @@
 package com.example.backend.model;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import jakarta.validation.constraints.NotEmpty;
+import org.springframework.data.annotation.Transient;
 import lombok.*;
 
 @Document(collection = "modules")
@@ -17,11 +18,15 @@ public class ModuleModel {
     @Id
     private String id;
 
-    @NotEmpty(message = "Module name cannot be empty")
+    @NotBlank(message = "Module name cannot be empty")
     private String moduleName;
 
-    @NotEmpty(message = "Description cannot be empty")
+    @NotBlank(message = "Description cannot be empty")
     private String description;
+
+     // This ensures userId is not stored in MongoDB
+    @NotBlank(message = "User ID cannot be empty")
+    private String userId;
 
     @DBRef
     private UserModel user; // Store a single user as admin

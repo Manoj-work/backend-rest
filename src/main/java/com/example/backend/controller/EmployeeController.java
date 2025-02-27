@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/hradmin/employees")
@@ -16,24 +17,30 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    // ✅ Create Employee
+    //Create Employee
     @PostMapping
-    public ResponseEntity<EmployeeModel> createEmployee(@Valid @RequestBody EmployeeModel employee) {
+    public ResponseEntity<Map<String,Object>> createEmployee(@Valid @RequestBody EmployeeModel employee) {
         EmployeeModel savedEmployee = employeeService.createEmployee(employee);
-        return ResponseEntity.ok(savedEmployee);
+        return ResponseEntity.ok(Map.of(
+                "message","Created Employee Successfully",
+                "Employee",savedEmployee
+        ));
     }
 
-    // ✅ Get All Employees
+    // Get All Employees
     @GetMapping
     public ResponseEntity<List<EmployeeModel>> getAllEmployees() {
         List<EmployeeModel> employees = employeeService.getAllEmployees();
         return ResponseEntity.ok(employees);
     }
 
-    // ✅ Update Employee
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeModel> updateEmployee(@PathVariable String id, @Valid @RequestBody EmployeeModel employee) {
+    public ResponseEntity<Map<String, Object>> updateEmployee(@PathVariable String id, @Valid @RequestBody EmployeeModel employee) {
         EmployeeModel updatedEmployee = employeeService.updateEmployee(id, employee);
-        return ResponseEntity.ok(updatedEmployee);
+        return ResponseEntity.ok(Map.of(
+                "message", "Updated Employee Successfully",
+                "Employee", updatedEmployee
+        ));
     }
+
 }

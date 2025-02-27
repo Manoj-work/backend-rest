@@ -18,23 +18,18 @@ public class ModuleService {
     @Autowired
     private UserRepository userRepository;
 
-    // Get all modules with user details
-    public List<ModuleModel> getAllModules() {
-        return moduleRepository.findAll();
+    public ModuleModel createModule(ModuleModel moduleModel) {
+        // Fetch UserModel using userId
+        UserModel user = userRepository.findById(moduleModel.getUserId())
+                .orElseThrow(() -> new RuntimeException("User with ID " + moduleModel.getUserId() + " not found"));
+
+        moduleModel.setUser(user); // Set the fetched user
+        moduleModel.setUserId(moduleModel.getUserId()); // Clear userId as it's not needed in DB
+
+        return moduleRepository.save(moduleModel);
     }
 
-    // Create a module and assign a user
-    public ModuleModel createModule(String moduleName, String description, String userId) {
-        UserModel user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return null;
-        }
-
-        ModuleModel module = new ModuleModel();
-        module.setModuleName(moduleName);
-        module.setDescription(description);
-        module.setUser(user);
-
-        return moduleRepository.save(module);
+    public List<ModuleModel> getAllModules() {
+        return moduleRepository.findAll();
     }
 }
