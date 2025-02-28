@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -39,6 +40,21 @@ public class EmployeeService {
     // Update Employee
     public EmployeeModel updateEmployee(String id, EmployeeModel updatedEmployee) {
         return employeeRepository.findById(id).map(existingEmployee -> {
+
+            if(updatedEmployee.getEmail() != null){
+                Optional<EmployeeModel> emailExists = employeeRepository.findByEmail(updatedEmployee.getEmail());
+                if(emailExists.isPresent() && !emailExists.get().getId().equals(id)){
+                    throw new DuplicateResourceException(emailExists.get().getEmail() +" : Email is already in use by other Employee");
+                }
+            }
+
+
+            Optional<EmployeeModel> phoneExists = employeeRepository.findByPhone(updatedEmployee.getPhone());
+            if(phoneExists.isPresent() && !phoneExists.get().getId().equals(id)){
+                throw new DuplicateResourceException(phoneExists.get().getPhone() +" : Phone number is already in use by other Employee");
+            }
+
+
             existingEmployee.setName(updatedEmployee.getName());
             existingEmployee.setTitle(updatedEmployee.getTitle());
             existingEmployee.setEmail(updatedEmployee.getEmail());
