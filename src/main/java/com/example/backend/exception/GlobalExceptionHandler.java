@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,4 +39,15 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", ex.getMessage());
         return errorResponse;
     }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403 Forbidden
+    @ExceptionHandler(AccessDeniedException.class)
+    public Map<String, String> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("status", "403");
+        errorResponse.put("error", "Forbidden");
+        errorResponse.put("message", "You do not have permission to access this resource.");
+        return errorResponse;
+    }
+
 }
