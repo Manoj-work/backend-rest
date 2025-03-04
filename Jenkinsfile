@@ -2,21 +2,20 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CMD = "/opt/homebrew/bin/docker"
+        PODMAN_CMD = "/usr/bin/podman"  // Path to Podman on your server
         IMAGE_NAME = "backend"
         IMAGE_TAG = "latest"
         TAR_FILE = "backend.tar"
         SSH_USER = "ankitm"
-        SERVER_IP = "192.168.0.200"
-        SHARED_DIR = "/home/ankitm/shared"
-        GIT_REPO = "https://github.com/Ankitkumar0909/Medhircode.git"
+        SHARED_DIR = "/home/ankitm/shared"  // Path to the shared directory on your server
+        GIT_REPO = "http://192.168.0.101:3000/jadhav.manoj/Backend-Rest.git"
         GIT_BRANCH = "main"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: GIT_BRANCH, url: GIT_REPO
+                git branch: main, url: http://192.168.0.101:3000/jadhav.manoj/Backend-Rest.git
             }
         }
 
@@ -33,28 +32,30 @@ pipeline {
             }
         }
 
-        stage('Build and Save Docker Image') {
+        stage('Build and Save Podman Image') {
             steps {
                 script {
                     try {
-                        sh "${DOCKER_CMD} build --platform=linux/amd64 -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                        sh "${DOCKER_CMD} save -o ${TAR_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
-                        echo "✅ Docker Image Built and Saved: ${IMAGE_NAME}:${IMAGE_TAG}"
+                        // Use Podman instead of Docker to build and save the image
+                        sh "${PODMAN_CMD} build --platform=linux/amd64 -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                        sh "${PODMAN_CMD} save -o ${TAR_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
+                        echo "✅ Podman Image Built and Saved: ${IMAGE_NAME}:${IMAGE_TAG}"
                     } catch (Exception e) {
-                        error "❌ Docker build or save failed: ${e.message}"
+                        error "❌ Podman build or save failed: ${e.message}"
                     }
                 }
             }
         }
 
-        stage('Transfer TAR File to Server') {
+        stage('Move TAR File to Shared Repository') {
             steps {
                 script {
                     try {
-                        sh "scp ${TAR_FILE} ${SSH_USER}@${SERVER_IP}:${SHARED_DIR}/"
-                        echo "✅ TAR file transferred successfully."
+                        // Move the tar file to the shared directory on the server
+                        sh "mv ${TAR_FILE} ${SHARED_DIR}/"
+                        echo "✅ TAR file moved to shared repository."
                     } catch (Exception e) {
-                        error "❌ TAR file transfer failed: ${e.message}"
+                        error "❌ Failed to move TAR file to shared repository: ${e.message}"
                     }
                 }
             }
@@ -64,15 +65,14 @@ pipeline {
             steps {
                 script {
                     try {
+                        // Since Jenkins is on the same server, we can run the commands directly
                         sh """
-                            ssh ${SSH_USER}@${SERVER_IP} "
                             set -xe;
                             sudo -u podman -i podman stop backend || true;
                             sudo -u podman -i podman rm backend || true;
                             sudo -u podman -i podman load -i ${SHARED_DIR}/${TAR_FILE};
-                            sudo -u podman -i podman run -d -p 4000:4000 --name backend backend:latest;
+                            sudo -u podman -i podman run -d --name backend --network shared -p 4000:4000 backend:latest
                             echo '✅ Backend container started successfully.'
-                            "
                         """
                         echo "✅ Deployment with Podman completed."
                     } catch (Exception e) {
@@ -86,12 +86,11 @@ pipeline {
             steps {
                 script {
                     try {
+                        // SSH into the server and check Podman container status
                         sh """
-                            ssh ${SSH_USER}@${SERVER_IP} "
                             set -xe;
                             sudo -u podman -i podman ps -a | grep backend;
                             sudo -u podman -i podman logs backend;
-                            "
                         """
                         echo "✅ Deployment verification completed."
                     } catch (Exception e) {
