@@ -13,8 +13,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +50,12 @@ public class AuthService {
 
         UserAccount user = userOpt.get();
         Set<Role> roles = user.getRoles(); // Get roles directly as Set<Role>
+        List<String> roleList = roles.stream()
+                .map(Enum :: name)
+                .collect(Collectors.toList());
 
         String token = jwtUtil.generateToken(user.getEmail(), roles); // Pass Set<Role> directly
-        return new AuthResponse(token);
+
+        return new AuthResponse(token,roleList);
     }
 }
