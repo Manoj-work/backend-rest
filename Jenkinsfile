@@ -10,6 +10,7 @@ pipeline {
         SHARED_DIR = "/home/ankitm/shared"  // Path to the shared directory on your server
         GIT_REPO = "http://192.168.0.101:3000/jadhav.manoj/Backend-Rest.git"
         GIT_BRANCH = "main"
+        GIT_CREDENTIALS_ID = "Jenkins"
     }
 
     stages {
