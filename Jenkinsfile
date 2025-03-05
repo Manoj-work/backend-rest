@@ -24,6 +24,7 @@ pipeline {
             steps {
                 script {
                     try {
+                        sh 'chmod +x ./gradlew'  // Ensure execution permission
                         sh './gradlew clean build'
                         echo "✅ Gradle build completed successfully."
                     } catch (Exception e) {
