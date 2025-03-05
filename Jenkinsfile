@@ -38,8 +38,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh "sudo -u podman -i podman build --platform=linux/amd64 -t ${env.IMAGE_NAME}:${env.IMAGE_TAG} ."
-                        sh "sudo -u podman -i podman save -o ${env.TAR_FILE} ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+                        sh "  podman build --platform=linux/amd64 -t ${env.IMAGE_NAME}:${env.IMAGE_TAG} ."
+                        sh " podman save -o ${env.TAR_FILE} ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
                         echo "✅ Podman Image Built and Saved: ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
                     } catch (Exception e) {
                         error "❌ Podman build or save failed: ${e.message}"
