@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the specific JAR file into the container
 COPY build/libs/backend-0.0.1-SNAPSHOT.jar app.jar
 
+# Copy the SSL certificate
+COPY backend-keystore.p12 /app/backend-keystore.p12
+
 # Expose the application port (default for Spring Boot)
 EXPOSE 8080
 
