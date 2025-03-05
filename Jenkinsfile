@@ -34,14 +34,13 @@ pipeline {
             }
         }
 
-        stage('Build and Save Podman Image') {
+           stage('Build and Save Podman Image') {
             steps {
                 script {
                     try {
-                        // Use Podman instead of Docker to build and save the image
-                        sh "${PODMAN_CMD} build --platform=linux/amd64 -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                        sh "${PODMAN_CMD} save -o ${TAR_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
-                        echo "✅ Podman Image Built and Saved: ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "sudo -u podman -i /usr/bin/podman build --platform=linux/amd64 -t ${env.IMAGE_NAME}:${env.IMAGE_TAG} ."
+                        sh "sudo -u podman -i /usr/bin/podman save -o ${env.TAR_FILE} ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+                        echo "✅ Podman Image Built and Saved: ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
                     } catch (Exception e) {
                         error "❌ Podman build or save failed: ${e.message}"
                     }
